@@ -6,12 +6,14 @@
 #include <wldp.h>
 #include <iostream>
 #include <string>
-#include "PowerManager.h"
+#include <fstream>
+
+using namespace std;
 
 #pragma comment (lib,"wldp.lib")
 #define MAX_LOADSTRING 100
 
-// Global Variables:
+//Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
