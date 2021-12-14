@@ -6,6 +6,7 @@
 #include <wldp.h>
 #include <iostream>
 #include <string>
+#include "PowerManager.h"
 
 #pragma comment (lib,"wldp.lib")
 #define MAX_LOADSTRING 100
@@ -46,6 +47,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    CPowerManager* cpm = new CPowerManager();
+    cpm->Start();
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
@@ -111,7 +114,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
-
+   MessageBox(NULL, L"Started", L"Message", 0);
    return TRUE;
 }
 
@@ -146,9 +149,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
-            case IDM_ABOUT:
-                MessageBox(NULL, std::to_wstring( IsSmode()).c_str(), L"Message", 0);
-                //DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            case IDM_ABOUT:            
+                MessageBox(NULL, std::to_wstring(IsSmode()).c_str(), L"Message", 0);           
+                //DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);               
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);

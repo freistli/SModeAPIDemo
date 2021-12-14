@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <windows.h>
-#include <wldp.h> 
-
-#pragma comment (lib,"wldp.lib")
-
+#include <wldp.h>  
+#include "PowerManager.h"
+#pragma comment (lib,"wldp.lib") 
+ 
+ 
 int IsSmode(void) {
     WLDP_WINDOWS_LOCKDOWN_MODE mode;
     WldpQueryWindowsLockdownMode(&mode);
@@ -17,8 +18,16 @@ int IsSmode(void) {
         return 1;
     }
 }
+ 
+
 int main()
 {
+
+    CPowerManager *cpm = new CPowerManager();
+     
+    cpm->Start();
+    int i = 0;
+    std::cin >> i;
     std::cout << "Hello World!\n" << IsSmode();
 }
 
