@@ -46,9 +46,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWSPROJECT1));
 
     MSG msg;
-
-    CPowerManager* cpm = new CPowerManager();
-    cpm->Start();
+    
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
@@ -112,6 +110,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
+   HPOWERNOTIFY    g_hPowerNotify = NULL;
+   g_hPowerNotify = RegisterSuspendResumeNotification((HANDLE)hWnd, DEVICE_NOTIFY_WINDOW_HANDLE);
+
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
    MessageBox(NULL, L"Started", L"Message", 0);
@@ -138,29 +139,68 @@ int IsSmode(void) {
         return 1;
     }
 }
+inline string getCurrentDateTime(string s) {
+    time_t now = time(0);
+    struct tm  tstruct;
+    char  buf[80];
+#pragma warning(suppress : 4996)
+    tstruct = *localtime(&now);
+    if (s == "now")
+        strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+    else if (s == "date")
+        strftime(buf, sizeof(buf), "%Y-%m-%d", &tstruct);
+    return string(buf);
+};
+inline void Logger(string logMsg) {
 
+    string filePath = "log_" + getCurrentDateTime("date") + ".txt";
+    string now = getCurrentDateTime("now");
+    ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app);
+    ofs << now << '\t' << logMsg << '\n';
+    ofs.close();
+}
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // Parse the menu selections:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
-            case IDM_ABOUT:            
-                MessageBox(NULL, std::to_wstring(IsSmode()).c_str(), L"Message", 0);           
-                //DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);               
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case IDM_ABOUT:
+            MessageBox(NULL, std::to_wstring(IsSmode()).c_str(), L"Message", 0);
+            //DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);               
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
+    }
+    break;
+    case WM_POWERBROADCAST:
+    {
+        switch (wParam)
+        {
+        case PBT_APMSUSPEND:
+            Logger("PBT_APMSUSPEND");
+            break;
+        case PBT_APMRESUMEAUTOMATIC:
+            Logger("PBT_APMRESUMEAUTOMATIC");
+            break;
+        case PBT_POWERSETTINGCHANGE:
+            Logger("PBT_POWERSETTINGCHANGE");
+            break;
+        case PBT_APMRESUMESUSPEND:
+            Logger("PBT_APMRESUMESUSPEND");
+        default:
         break;
+        }
+    }
+    break;
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
